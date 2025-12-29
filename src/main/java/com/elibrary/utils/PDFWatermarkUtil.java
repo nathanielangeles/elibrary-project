@@ -4,7 +4,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class PDFWatermarkUtil {
                 );
                 
                 // Set font and size for watermark
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
                 
                 // Set watermark position (bottom left of the page)
                 contentStream.beginText();

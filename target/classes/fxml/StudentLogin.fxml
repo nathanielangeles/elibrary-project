@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.elibrary.controllers.StudentLoginController"
+            styleClass="main-container">
+    
+    <center>
+        <VBox alignment="CENTER" spacing="25" maxWidth="400">
+            <padding>
+                <Insets top="50" right="30" bottom="50" left="30"/>
+            </padding>
+            
+            <!-- Login Container -->
+            <VBox alignment="CENTER" spacing="20" styleClass="login-container">
+                <padding>
+                    <Insets top="40" right="40" bottom="40" left="40"/>
+                </padding>
+                
+                <!-- Title -->
+                <Text text="Student Login" styleClass="section-title"/>
+                <Text text="Enter your LRN to access the library" style="-fx-fill: #7f8c8d;"/>
+                
+                <!-- LRN Field -->
+                <VBox spacing="8" prefWidth="300">
+                    <Label text="Learner Reference Number (LRN)" styleClass="label-bold"/>
+                    <TextField fx:id="lrnField" promptText="Enter your 12-digit LRN" 
+                              prefHeight="40" onAction="#handleLogin"/>
+                </VBox>
+                
+                <!-- Error Label -->
+                <Label fx:id="errorLabel" textFill="red" wrapText="true" visible="false"/>
+                
+                <!-- Login Button -->
+                <Button text="Login" onAction="#handleLogin" 
+                       styleClass="button, button-primary, button-large" 
+                       prefWidth="300" prefHeight="45"/>
+                
+                <!-- Back Button -->
+                <Button text="Back" onAction="#handleBack" 
+                       styleClass="button, button-secondary" 
+                       prefWidth="150"/>
+            </VBox>
+            
+            <!-- Helper Text -->
+            <VBox alignment="CENTER" spacing="5">
+                <Text text="Don't have an LRN?" style="-fx-fill: #95a5a6; -fx-font-size: 12px;"/>
+                <Text text="Contact your school administrator" style="-fx-fill: #7f8c8d; -fx-font-size: 12px;"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

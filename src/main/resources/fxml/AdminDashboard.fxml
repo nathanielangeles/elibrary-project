@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.elibrary.controllers.AdminDashboardController"
+            prefHeight="750" prefWidth="1200">
+    
+    <!-- Top Menu Bar -->
+    <top>
+        <VBox>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="tool-bar" prefHeight="60">
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+                
+                <Text text="E-Library Admin" styleClass="title" style="-fx-font-size: 24px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="welcomeLabel" text="Welcome, Admin!" styleClass="label-bold" style="-fx-font-size: 14px;"/>
+                <Button text="Logout" onAction="#handleLogout" styleClass="button, button-danger"/>
+            </HBox>
+            
+            <!-- Statistics Bar -->
+            <HBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-padding: 20px;">
+                <!-- Total Books -->
+                <VBox alignment="CENTER" styleClass="stat-card" prefWidth="200">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label fx:id="totalBooksLabel" text="0" styleClass="stat-number"/>
+                    <Label text="Total Books" styleClass="stat-label"/>
+                </VBox>
+                
+                <!-- Total Students -->
+                <VBox alignment="CENTER" styleClass="stat-card" prefWidth="200">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label fx:id="totalStudentsLabel" text="0" styleClass="stat-number"/>
+                    <Label text="Total Students" styleClass="stat-label"/>
+                </VBox>
+                
+                <!-- Total Views -->
+                <VBox alignment="CENTER" styleClass="stat-card" prefWidth="200">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label fx:id="totalViewsLabel" text="0" styleClass="stat-number"/>
+                    <Label text="Total Views" styleClass="stat-label"/>
+                </VBox>
+                
+                <!-- Total Downloads -->
+                <VBox alignment="CENTER" styleClass="stat-card" prefWidth="200">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    <Label fx:id="totalDownloadsLabel" text="0" styleClass="stat-number"/>
+                    <Label text="Total Downloads" styleClass="stat-label"/>
+                </VBox>
+            </HBox>
+            
+            <!-- Action Buttons -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ecf0f1; -fx-padding: 15px 20px;">
+                <Button text="Add Book" onAction="#handleAddBook" styleClass="button, button-success"/>
+                <Button text="Manage Categories" onAction="#handleManageCategories" styleClass="button, button-primary"/>
+                <Button text="View Access Logs" onAction="#handleViewLogs" styleClass="button, button-secondary"/>
+                <Button text="Refresh" onAction="#handleRefresh" styleClass="button, button-secondary"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Center - Books Table -->
+    <center>
+        <VBox spacing="10" style="-fx-background-color: white;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <!-- Table Header -->
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="Book Management" styleClass="section-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Search books..." prefWidth="300"/>
+                <Button text="Search" onAction="#handleSearch" styleClass="button, button-primary"/>
+            </HBox>
+            
+            <!-- Books Table -->
+            <TableView fx:id="booksTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="titleColumn" text="Title" prefWidth="250"/>
+                    <TableColumn fx:id="authorColumn" text="Author" prefWidth="200"/>
+                    <TableColumn fx:id="categoryColumn" text="Category" prefWidth="150"/>
+                    <TableColumn fx:id="yearColumn" text="Year" prefWidth="80"/>
+                    <TableColumn fx:id="viewsColumn" text="Views" prefWidth="80"/>
+                    <TableColumn fx:id="downloadsColumn" text="Downloads" prefWidth="100"/>
+                    <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="200"/>
+                </columns>
+            </TableView>
+            
+            <!-- Action Buttons for Selected Book -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button text="Edit Selected" onAction="#handleEditBook" styleClass="button, button-primary"/>
+                <Button text="Delete Selected" onAction="#handleDeleteBook" styleClass="button, button-danger"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="selectionLabel" text="No book selected" style="-fx-text-fill: #7f8c8d;"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 10px 20px;">
+            <Label fx:id="statusLabel" text="Ready" textFill="white" style="-fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Admin Dashboard v1.0" textFill="white" style="-fx-font-size: 11px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

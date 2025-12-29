@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox alignment="CENTER" spacing="30" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.elibrary.controllers.LoginSelectionController"
+      styleClass="main-container" 
+      prefHeight="600" prefWidth="800">
+    
+    <padding>
+        <Insets top="50" right="50" bottom="50" left="50"/>
+    </padding>
+    
+    <!-- Title -->
+    <VBox alignment="CENTER" spacing="10">
+        <Label text="E-Library Management System" styleClass="title"/>
+        <Label text="Welcome! Please select your login type" styleClass="subtitle"/>
+    </VBox>
+    
+    <!-- Login Selection Buttons -->
+    <HBox alignment="CENTER" spacing="40">
+        
+        <!-- Student Login Card -->
+        <VBox alignment="CENTER" spacing="20" styleClass="login-container" prefWidth="300" prefHeight="250">
+            <Label text="Student Portal" styleClass="section-title"/>
+            <Label text="Access the digital library" style="-fx-text-fill: #7f8c8d;"/>
+            <Label text="Browse and download books" style="-fx-text-fill: #7f8c8d;"/>
+            <Label text="Track your reading history" style="-fx-text-fill: #7f8c8d;"/>
+            <Button text="Student Login" onAction="#handleStudentLogin" styleClass="button, button-primary, button-large" prefWidth="200"/>
+        </VBox>
+        
+        <!-- Admin Login Card -->
+        <VBox alignment="CENTER" spacing="20" styleClass="login-container" prefWidth="300" prefHeight="250">
+            <Label text="Admin Portal" styleClass="section-title"/>
+            <Label text="Manage library resources" style="-fx-text-fill: #7f8c8d;"/>
+            <Label text="Add, edit, and delete books" style="-fx-text-fill: #7f8c8d;"/>
+            <Label text="View statistics and logs" style="-fx-text-fill: #7f8c8d;"/>
+            <Button text="Admin Login" onAction="#handleAdminLogin" styleClass="button, button-success, button-large" prefWidth="200"/>
+        </VBox>
+        
+    </HBox>
+    
+    <!-- Footer -->
+    <Label text="© 2025 E-Library Management System v1.0" style="-fx-text-fill: #95a5a6; -fx-font-size: 12px;"/>
+    
+</VBox>

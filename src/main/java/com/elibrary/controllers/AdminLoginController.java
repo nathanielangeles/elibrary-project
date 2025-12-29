@@ -6,6 +6,7 @@ import com.elibrary.models.Admin;
 import com.elibrary.utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -19,6 +20,9 @@ public class AdminLoginController {
     
     @FXML
     private PasswordField passwordField;
+    
+    @FXML
+    private Label errorLabel;
     
     private AdminDAO adminDAO;
     

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.elibrary.controllers.StudentDashboardController"
+            prefHeight="700" prefWidth="1000">
+    
+    <!-- Top Menu Bar -->
+    <top>
+        <VBox>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="tool-bar" prefHeight="60">
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+                
+                <Text text="E-Library" styleClass="title" style="-fx-font-size: 24px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="welcomeLabel" text="Welcome, Student!" styleClass="label-bold" style="-fx-font-size: 14px;"/>
+                <Button text="Logout" onAction="#handleLogout" styleClass="button, button-secondary"/>
+            </HBox>
+            
+            <!-- Search and Filter Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 15px 20px; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
+                <TextField fx:id="searchField" promptText="Search books by title, author, or keywords..." 
+                          styleClass="search-bar" prefWidth="400" prefHeight="35"/>
+                <Button text="Search" onAction="#handleSearch" styleClass="button, button-primary"/>
+                <Button text="Clear" onAction="#handleClearSearch" styleClass="button, button-secondary"/>
+                
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <Label text="Category:" styleClass="label-bold"/>
+                <ComboBox fx:id="categoryComboBox" promptText="All Categories" prefWidth="200" onAction="#handleCategoryFilter"/>
+                <Button text="My History" onAction="#handleViewHistory" styleClass="button, button-success"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Center - Books Grid -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #ecf0f1;">
+            <VBox spacing="20" style="-fx-background-color: #ecf0f1;">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <!-- Results Count -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="resultsLabel" text="Showing all books" styleClass="label-bold" style="-fx-font-size: 14px;"/>
+                </HBox>
+                
+                <!-- Books Grid -->
+                <GridPane fx:id="booksGrid" hgap="20" vgap="20"/>
+                
+                <!-- No Results Message -->
+                <VBox fx:id="noResultsPane" alignment="CENTER" spacing="10" visible="false" prefHeight="300">
+                    <Text text="No books found" style="-fx-font-size: 20px; -fx-fill: #7f8c8d;"/>
+                    <Text text="Try adjusting your search criteria" style="-fx-font-size: 14px; -fx-fill: #95a5a6;"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 10px 20px;">
+            <Label fx:id="statusLabel" text="Ready" textFill="white" style="-fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="bookCountLabel" text="0 books available" textFill="white" style="-fx-font-size: 12px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

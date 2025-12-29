@@ -22,17 +22,20 @@ public class MainApp extends Application {
             // Load the login selection screen
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/LoginSelection.fxml"));
             
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 800, 600);
             scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
             
             primaryStage.setTitle("E-Library Management System");
             primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
+            primaryStage.setMinWidth(800);
+            primaryStage.setMinHeight(600);
+            primaryStage.setMaximized(true);  // Maximize window by default
             primaryStage.show();
             
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error starting application: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -51,17 +54,32 @@ public class MainApp extends Application {
      */
     public static void changeScene(String fxmlFile, String title) {
         try {
-            Parent root = FXMLLoader.load(MainApp.class.getResource(fxmlFile));
-            Scene scene = new Scene(root);
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource(fxmlFile));
+            Parent root = loader.load();
+            
+            // Determine scene size based on the screen being loaded
+            double width = 800;
+            double height = 600;
+            
+            if (fxmlFile.contains("Dashboard")) {
+                width = 1200;
+                height = 750;
+            }
+            
+            Scene scene = new Scene(root, width, height);
             scene.getStylesheets().add(MainApp.class.getResource("/css/styles.css").toExternalForm());
             
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
-            primaryStage.show();
+            primaryStage.setMinWidth(width);
+            primaryStage.setMinHeight(height);
+            primaryStage.setMaximized(true);  // Keep window maximized
+            primaryStage.centerOnScreen();
             
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error changing scene: " + e.getMessage());
+            System.err.println("Attempted to load: " + fxmlFile);
         }
     }
     
