@@ -7,7 +7,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.elibrary.controllers.StudentDashboardController"
-            prefHeight="700" prefWidth="1000">
+            prefHeight="700" prefWidth="1000"
+            style="-fx-background-color: #ecf0f1;">
     
     <!-- Top Menu Bar -->
     <top>
@@ -42,7 +43,7 @@
     
     <!-- Center - Books Grid -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #ecf0f1;">
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: #ecf0f1;">
             <VBox spacing="20" style="-fx-background-color: #ecf0f1;">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
@@ -53,11 +54,13 @@
                     <Label fx:id="resultsLabel" text="Showing all books" styleClass="label-bold" style="-fx-font-size: 14px;"/>
                 </HBox>
                 
-                <!-- Books Grid -->
-                <GridPane fx:id="booksGrid" hgap="20" vgap="20"/>
+                <!-- Books Grid - Using FlowPane for responsive layout -->
+                <FlowPane fx:id="booksGrid" hgap="20" vgap="20" alignment="TOP_LEFT" 
+                         style="-fx-background-color: #ecf0f1;"/>
                 
                 <!-- No Results Message -->
                 <VBox fx:id="noResultsPane" alignment="CENTER" spacing="10" visible="false" prefHeight="300">
+                    <Text text="📚" style="-fx-font-size: 72px;"/>
                     <Text text="No books found" style="-fx-font-size: 20px; -fx-fill: #7f8c8d;"/>
                     <Text text="Try adjusting your search criteria" style="-fx-font-size: 14px; -fx-fill: #95a5a6;"/>
                 </VBox>
