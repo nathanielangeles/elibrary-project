@@ -15,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,32 +59,50 @@ public class AdminDashboardController {
     
     @FXML
     public void initialize() {
-        bookDAO = new BookDAO();
-        categoryDAO = new CategoryDAO();
-        studentDAO = new StudentDAO();
-        accessLogDAO = new AccessLogDAO();
-        currentAdmin = SessionManager.getInstance().getCurrentAdmin();
-        
-        // Set welcome message
-        if (currentAdmin != null) {
-            welcomeLabel.setText("Welcome, " + currentAdmin.getFirstName() + "!");
-        }
-        
-        // Setup table columns
-        setupTableColumns();
-        
-        // Load data
-        loadStatistics();
-        loadBooks();
-        
-        // Setup selection listener
-        booksTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                selectionLabel.setText("Selected: " + newSelection.getTitle());
+        try {
+            System.out.println("AdminDashboardController initializing...");
+            
+            bookDAO = new BookDAO();
+            categoryDAO = new CategoryDAO();
+            studentDAO = new StudentDAO();
+            accessLogDAO = new AccessLogDAO();
+            currentAdmin = SessionManager.getInstance().getCurrentAdmin();
+            
+            System.out.println("DAOs initialized successfully");
+            
+            // Set welcome message
+            if (currentAdmin != null) {
+                welcomeLabel.setText("Welcome, " + currentAdmin.getFirstName() + "!");
+                System.out.println("Welcome label set for: " + currentAdmin.getFirstName());
             } else {
-                selectionLabel.setText("No book selected");
+                System.err.println("WARNING: Current admin is null!");
             }
-        });
+            
+            // Setup table columns
+            setupTableColumns();
+            System.out.println("Table columns set up");
+            
+            // Load data
+            loadStatistics();
+            System.out.println("Statistics loaded");
+            
+            loadBooks();
+            System.out.println("Books loaded");
+            
+            // Setup selection listener
+            booksTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    selectionLabel.setText("Selected: " + newSelection.getTitle());
+                } else {
+                    selectionLabel.setText("No book selected");
+                }
+            });
+            
+            System.out.println("AdminDashboardController initialization complete");
+        } catch (Exception e) {
+            System.err.println("ERROR in AdminDashboardController.initialize(): " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -210,11 +229,12 @@ public class AdminDashboardController {
         categoryCombo.getItems().addAll(categoryDAO.getAllCategories());
         categoryCombo.setPromptText("Select Category");
         
-        Label fileLabel = new Label("No file selected");
-        Button fileButton = new Button("Choose PDF File");
-        final File[] selectedFile = {null};
+        // PDF File Selection
+        Label pdfFileLabel = new Label("No file selected");
+        Button pdfFileButton = new Button("Choose PDF File");
+        final File[] selectedPdfFile = {null};
         
-        fileButton.setOnAction(e -> {
+        pdfFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select PDF Book");
             fileChooser.getExtensionFilters().add(
@@ -222,10 +242,43 @@ public class AdminDashboardController {
             );
             File file = fileChooser.showOpenDialog(dialog.getOwner());
             if (file != null) {
-                selectedFile[0] = file;
-                fileLabel.setText(file.getName());
+                selectedPdfFile[0] = file;
+                pdfFileLabel.setText(file.getName());
             }
         });
+        
+        // Cover Image Selection
+        Label coverImageLabel = new Label("No cover image selected");
+        Button coverImageButton = new Button("Choose Cover Image");
+        ImageView coverPreview = new ImageView();
+        coverPreview.setFitWidth(100);
+        coverPreview.setFitHeight(140);
+        coverPreview.setPreserveRatio(true);
+        coverPreview.setStyle("-fx-border-color: #ccc; -fx-border-width: 1;");
+        final File[] selectedCoverImage = {null};
+        
+        coverImageButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Cover Image");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+            );
+            File file = fileChooser.showOpenDialog(dialog.getOwner());
+            if (file != null) {
+                selectedCoverImage[0] = file;
+                coverImageLabel.setText(file.getName());
+                // Show preview
+                try {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(file.toURI().toString());
+                    coverPreview.setImage(image);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        
+        VBox coverBox = new VBox(10);
+        coverBox.getChildren().addAll(coverImageButton, coverImageLabel, coverPreview);
         
         grid.add(new Label("Title:"), 0, 0);
         grid.add(titleField, 1, 0);
@@ -238,15 +291,17 @@ public class AdminDashboardController {
         grid.add(new Label("Description:"), 0, 4);
         grid.add(descriptionArea, 1, 4);
         grid.add(new Label("PDF File:"), 0, 5);
-        grid.add(fileButton, 1, 5);
-        grid.add(fileLabel, 1, 6);
+        grid.add(pdfFileButton, 1, 5);
+        grid.add(pdfFileLabel, 1, 6);
+        grid.add(new Label("Cover Image:"), 0, 7);
+        grid.add(coverBox, 1, 7);
         
         dialog.getDialogPane().setContent(grid);
         
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButtonType) {
                 if (titleField.getText().isEmpty() || authorField.getText().isEmpty() || 
-                    yearField.getText().isEmpty() || categoryCombo.getValue() == null || selectedFile[0] == null) {
+                    yearField.getText().isEmpty() || categoryCombo.getValue() == null || selectedPdfFile[0] == null) {
                     showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill all required fields and select a PDF file.");
                     return null;
                 }
@@ -259,18 +314,31 @@ public class AdminDashboardController {
                     book.setCategoryId(categoryCombo.getValue().getCategoryId());
                     book.setDescription(descriptionArea.getText());
                     
-                    // Copy file to library directory
+                    // Copy PDF file to library directory
                     File libraryDir = new File("library/books");
                     if (!libraryDir.exists()) {
                         libraryDir.mkdirs();
                     }
                     
-                    String fileName = System.currentTimeMillis() + "_" + selectedFile[0].getName();
-                    File destFile = new File(libraryDir, fileName);
-                    Files.copy(selectedFile[0].toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    String pdfFileName = System.currentTimeMillis() + "_" + selectedPdfFile[0].getName();
+                    File destPdfFile = new File(libraryDir, pdfFileName);
+                    Files.copy(selectedPdfFile[0].toPath(), destPdfFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    book.setFilePath(destPdfFile.getPath());
                     
-                    book.setFilePath(destFile.getPath());
-                    book.setCoverImagePath(null); // Can be enhanced to upload cover
+                    // Copy cover image if selected
+                    if (selectedCoverImage[0] != null) {
+                        File coversDir = new File("library/covers");
+                        if (!coversDir.exists()) {
+                            coversDir.mkdirs();
+                        }
+                        
+                        String coverFileName = System.currentTimeMillis() + "_cover_" + selectedCoverImage[0].getName();
+                        File destCoverFile = new File(coversDir, coverFileName);
+                        Files.copy(selectedCoverImage[0].toPath(), destCoverFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        book.setCoverImagePath(destCoverFile.getPath());
+                    } else {
+                        book.setCoverImagePath(null);
+                    }
                     
                     return book;
                 } catch (Exception e) {
@@ -334,6 +402,66 @@ public class AdminDashboardController {
             .findFirst()
             .ifPresent(categoryCombo::setValue);
         
+        // Cover Image Section
+        Label coverImageLabel = new Label(book.getCoverImagePath() != null ? "Current cover" : "No cover image");
+        Button coverImageButton = new Button("Change Cover Image");
+        Button removeCoverButton = new Button("Remove Cover");
+        ImageView coverPreview = new ImageView();
+        coverPreview.setFitWidth(100);
+        coverPreview.setFitHeight(140);
+        coverPreview.setPreserveRatio(true);
+        coverPreview.setStyle("-fx-border-color: #ccc; -fx-border-width: 1;");
+        
+        // Load existing cover if available
+        if (book.getCoverImagePath() != null) {
+            try {
+                File coverFile = new File(book.getCoverImagePath());
+                if (coverFile.exists()) {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(coverFile.toURI().toString());
+                    coverPreview.setImage(image);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        final File[] selectedCoverImage = {null};
+        final boolean[] removeCover = {false};
+        
+        coverImageButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Cover Image");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+            );
+            File file = fileChooser.showOpenDialog(dialog.getOwner());
+            if (file != null) {
+                selectedCoverImage[0] = file;
+                removeCover[0] = false;
+                coverImageLabel.setText(file.getName());
+                // Show preview
+                try {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(file.toURI().toString());
+                    coverPreview.setImage(image);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        
+        removeCoverButton.setOnAction(e -> {
+            removeCover[0] = true;
+            selectedCoverImage[0] = null;
+            coverPreview.setImage(null);
+            coverImageLabel.setText("Cover will be removed");
+        });
+        
+        HBox coverButtonBox = new HBox(10);
+        coverButtonBox.getChildren().addAll(coverImageButton, removeCoverButton);
+        
+        VBox coverBox = new VBox(10);
+        coverBox.getChildren().addAll(coverButtonBox, coverImageLabel, coverPreview);
+        
         grid.add(new Label("Title:"), 0, 0);
         grid.add(titleField, 1, 0);
         grid.add(new Label("Author:"), 0, 1);
@@ -344,6 +472,8 @@ public class AdminDashboardController {
         grid.add(categoryCombo, 1, 3);
         grid.add(new Label("Description:"), 0, 4);
         grid.add(descriptionArea, 1, 4);
+        grid.add(new Label("Cover Image:"), 0, 5);
+        grid.add(coverBox, 1, 5);
         
         dialog.getDialogPane().setContent(grid);
         
@@ -354,6 +484,43 @@ public class AdminDashboardController {
                 book.setYearPublished(Integer.parseInt(yearField.getText()));
                 book.setCategoryId(categoryCombo.getValue().getCategoryId());
                 book.setDescription(descriptionArea.getText());
+                
+                // Handle cover image
+                try {
+                    if (removeCover[0]) {
+                        // Remove existing cover
+                        if (book.getCoverImagePath() != null) {
+                            File oldCover = new File(book.getCoverImagePath());
+                            if (oldCover.exists()) {
+                                oldCover.delete();
+                            }
+                        }
+                        book.setCoverImagePath(null);
+                    } else if (selectedCoverImage[0] != null) {
+                        // Delete old cover if exists
+                        if (book.getCoverImagePath() != null) {
+                            File oldCover = new File(book.getCoverImagePath());
+                            if (oldCover.exists()) {
+                                oldCover.delete();
+                            }
+                        }
+                        
+                        // Copy new cover
+                        File coversDir = new File("library/covers");
+                        if (!coversDir.exists()) {
+                            coversDir.mkdirs();
+                        }
+                        
+                        String coverFileName = System.currentTimeMillis() + "_cover_" + selectedCoverImage[0].getName();
+                        File destCoverFile = new File(coversDir, coverFileName);
+                        Files.copy(selectedCoverImage[0].toPath(), destCoverFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        book.setCoverImagePath(destCoverFile.getPath());
+                    }
+                    // If neither remove nor new image selected, keep existing path
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to update cover image: " + e.getMessage());
+                }
+                
                 return book;
             }
             return null;

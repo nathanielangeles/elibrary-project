@@ -6,6 +6,7 @@ com/elibrary/database/AccessLogDAO.class
 com/elibrary/controllers/StudentDashboardController.class
 com/elibrary/controllers/StudentLoginController.class
 com/elibrary/database/BookDAO.class
+com/elibrary/controllers/PDFViewerController.class
 com/elibrary/models/Admin.class
 com/elibrary/utils/PDFWatermarkUtil.class
 com/elibrary/models/Category.class

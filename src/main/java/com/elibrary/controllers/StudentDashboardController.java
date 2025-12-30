@@ -7,14 +7,17 @@ import com.elibrary.database.CategoryDAO;
 import com.elibrary.models.Book;
 import com.elibrary.models.Category;
 import com.elibrary.models.Student;
-import com.elibrary.utils.PDFWatermarkUtil;
 import com.elibrary.utils.SessionManager;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.List;
@@ -189,19 +192,39 @@ public class StudentDashboardController {
             );
         });
         
-        // Cover placeholder
+        // Cover - use actual image if available, otherwise show placeholder
         StackPane coverPlaceholder = new StackPane();
         coverPlaceholder.setPrefSize(170, 220);
         coverPlaceholder.setMaxSize(170, 220);
         coverPlaceholder.setMinSize(170, 220);
-        coverPlaceholder.setStyle(
-            "-fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%); " +
-            "-fx-background-radius: 5px;"
-        );
         
-        Label coverLabel = new Label("📚");
-        coverLabel.setStyle("-fx-font-size: 48px;");
-        coverPlaceholder.getChildren().add(coverLabel);
+        if (book.getCoverImagePath() != null && !book.getCoverImagePath().isEmpty()) {
+            // Try to load actual cover image
+            try {
+                File coverFile = new File(book.getCoverImagePath());
+                if (coverFile.exists()) {
+                    javafx.scene.image.Image coverImage = new javafx.scene.image.Image(
+                        coverFile.toURI().toString(), 170, 220, false, true
+                    );
+                    ImageView imageView = new ImageView(coverImage);
+                    imageView.setFitWidth(170);
+                    imageView.setFitHeight(220);
+                    imageView.setPreserveRatio(false);
+                    imageView.setStyle("-fx-background-radius: 5px;");
+                    coverPlaceholder.getChildren().add(imageView);
+                    coverPlaceholder.setStyle("-fx-background-radius: 5px;");
+                } else {
+                    // Cover file doesn't exist, use placeholder
+                    addPlaceholderCover(coverPlaceholder);
+                }
+            } catch (Exception e) {
+                // Error loading image, use placeholder
+                addPlaceholderCover(coverPlaceholder);
+            }
+        } else {
+            // No cover image path, use placeholder
+            addPlaceholderCover(coverPlaceholder);
+        }
         
         // Book info container with fixed height
         VBox infoBox = new VBox(8);
@@ -246,77 +269,39 @@ public class StudentDashboardController {
             "-fx-font-weight: bold;"
         );
         
-        // Action buttons with consistent width
-        HBox buttonBox = new HBox(8);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPrefWidth(190);
-        
-        Button viewButton = new Button("View");
-        viewButton.setPrefWidth(85);
-        viewButton.setStyle(
+        // Single View/Open button - centered and wider
+        Button openButton = new Button("Open PDF");
+        openButton.setPrefWidth(170);
+        openButton.setStyle(
             "-fx-background-color: #3498db; " +
             "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
+            "-fx-font-size: 12px; " +
             "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
+            "-fx-padding: 8px 16px; " +
             "-fx-background-radius: 4px; " +
             "-fx-cursor: hand;"
         );
-        viewButton.setOnAction(e -> handleViewBook(book));
+        openButton.setOnAction(e -> handleOpenBook(book));
         
-        Button downloadButton = new Button("Download");
-        downloadButton.setPrefWidth(85);
-        downloadButton.setStyle(
-            "-fx-background-color: #27ae60; " +
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
-            "-fx-background-radius: 4px; " +
-            "-fx-cursor: hand;"
-        );
-        downloadButton.setOnAction(e -> handleDownloadBook(book));
-        
-        // Hover effects for buttons
-        viewButton.setOnMouseEntered(e -> viewButton.setStyle(
+        // Hover effect for button
+        openButton.setOnMouseEntered(e -> openButton.setStyle(
             "-fx-background-color: #2980b9; " +
             "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
+            "-fx-font-size: 12px; " +
             "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
+            "-fx-padding: 8px 16px; " +
             "-fx-background-radius: 4px; " +
             "-fx-cursor: hand;"
         ));
-        viewButton.setOnMouseExited(e -> viewButton.setStyle(
+        openButton.setOnMouseExited(e -> openButton.setStyle(
             "-fx-background-color: #3498db; " +
             "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
+            "-fx-font-size: 12px; " +
             "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
+            "-fx-padding: 8px 16px; " +
             "-fx-background-radius: 4px; " +
             "-fx-cursor: hand;"
         ));
-        
-        downloadButton.setOnMouseEntered(e -> downloadButton.setStyle(
-            "-fx-background-color: #229954; " +
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
-            "-fx-background-radius: 4px; " +
-            "-fx-cursor: hand;"
-        ));
-        downloadButton.setOnMouseExited(e -> downloadButton.setStyle(
-            "-fx-background-color: #27ae60; " +
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 11px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 6px 12px; " +
-            "-fx-background-radius: 4px; " +
-            "-fx-cursor: hand;"
-        ));
-        
-        buttonBox.getChildren().addAll(viewButton, downloadButton);
         
         // Add all components to card with proper spacing
         Region spacer1 = new Region();
@@ -331,13 +316,13 @@ public class StudentDashboardController {
             infoBox,
             categoryBadge,
             spacer2,
-            buttonBox
+            openButton
         );
         
-        // Make entire card clickable for viewing
+        // Make entire card clickable for opening
         card.setOnMouseClicked(e -> {
-            if (e.getClickCount() == 2) { // Double-click to view
-                handleViewBook(book);
+            if (e.getClickCount() == 2) { // Double-click to open
+                handleOpenBook(book);
             }
         });
         
@@ -391,58 +376,26 @@ public class StudentDashboardController {
     }
     
     /**
-     * Handle view book details
+     * Add placeholder cover to StackPane
      */
-    private void handleViewBook(Book book) {
-        // Log the view
-        accessLogDAO.logAccess(currentStudent.getStudentId(), book.getBookId(), "VIEW");
-        
-        // Create and show book details dialog
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Book Details");
-        alert.setHeaderText(book.getTitle());
-        
-        VBox content = new VBox(10);
-        content.setPrefWidth(500);
-        
-        content.getChildren().addAll(
-            new Label("Author: " + book.getAuthor()),
-            new Label("Category: " + book.getCategoryName()),
-            new Label("Year Published: " + book.getYearPublished()),
-            new Label(""),
-            new Label("Description:"),
-            new Text(book.getDescription() != null ? book.getDescription() : "No description available"),
-            new Label(""),
-            new Label("Statistics:"),
-            new Label("Views: " + book.getViewCount()),
-            new Label("Downloads: " + book.getDownloadCount())
+    private void addPlaceholderCover(StackPane coverPlaceholder) {
+        coverPlaceholder.setStyle(
+            "-fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%); " +
+            "-fx-background-radius: 5px;"
         );
-        
-        ScrollPane scrollPane = new ScrollPane(content);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(300);
-        
-        alert.getDialogPane().setContent(scrollPane);
-        
-        // Add download button to dialog
-        ButtonType downloadButtonType = new ButtonType("Download", ButtonBar.ButtonData.OK_DONE);
-        alert.getButtonTypes().add(downloadButtonType);
-        
-        alert.showAndWait().ifPresent(response -> {
-            if (response == downloadButtonType) {
-                handleDownloadBook(book);
-            }
-        });
-        
-        // Refresh book to update view count
-        loadAllBooks();
+        Label coverLabel = new Label("📚");
+        coverLabel.setStyle("-fx-font-size: 48px;");
+        coverPlaceholder.getChildren().add(coverLabel);
     }
     
     /**
-     * Handle download book
+     * Handle opening book in embedded PDF viewer
      */
-    private void handleDownloadBook(Book book) {
+    private void handleOpenBook(Book book) {
         try {
+            // Log the view
+            accessLogDAO.logAccess(currentStudent.getStudentId(), book.getBookId(), "VIEW");
+            
             // Check if book file exists
             File bookFile = new File(book.getFilePath());
             if (!bookFile.exists()) {
@@ -451,41 +404,39 @@ public class StudentDashboardController {
                 return;
             }
             
-            // Choose download location
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Choose Download Location");
-            directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            statusLabel.setText("Opening book...");
             
-            File selectedDirectory = directoryChooser.showDialog(MainApp.getPrimaryStage());
+            // Load PDF viewer FXML
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                getClass().getResource("/fxml/PDFViewer.fxml")
+            );
+            javafx.scene.Parent root = loader.load();
             
-            if (selectedDirectory != null) {
-                statusLabel.setText("Downloading book...");
-                
-                // Create watermarked PDF
-                File watermarkedFile = PDFWatermarkUtil.createWatermarkedCopy(
-                    book.getFilePath(),
-                    currentStudent.getLrn(),
-                    selectedDirectory.getAbsolutePath()
-                );
-                
-                // Log the download
-                accessLogDAO.logAccess(currentStudent.getStudentId(), book.getBookId(), "DOWNLOAD");
-                
-                statusLabel.setText("Download complete!");
-                
-                showAlert(Alert.AlertType.INFORMATION, "Download Successful", 
-                         "Book downloaded successfully to:\n" + watermarkedFile.getAbsolutePath() + 
-                         "\n\nYour LRN has been added as a watermark on the first page.");
-                
-                // Refresh book to update download count
-                loadAllBooks();
-            }
+            // Get controller and load PDF
+            PDFViewerController viewerController = loader.getController();
+            viewerController.loadPDF(bookFile, book.getTitle(), book.getAuthor());
+            
+            // Create and show stage
+            javafx.stage.Stage viewerStage = new javafx.stage.Stage();
+            viewerStage.setTitle("PDF Viewer - " + book.getTitle());
+            viewerStage.setScene(new javafx.scene.Scene(root));
+            viewerStage.setMaximized(true);
+            
+            // Cleanup on close
+            viewerStage.setOnCloseRequest(e -> viewerController.cleanup());
+            
+            viewerStage.show();
+            
+            statusLabel.setText("Book opened successfully");
+            
+            // Refresh book statistics
+            loadAllBooks();
             
         } catch (Exception e) {
             e.printStackTrace();
-            statusLabel.setText("Download failed");
-            showAlert(Alert.AlertType.ERROR, "Download Failed", 
-                     "Failed to download book: " + e.getMessage());
+            statusLabel.setText("Failed to open book");
+            showAlert(Alert.AlertType.ERROR, "Error Opening Book", 
+                     "Failed to open the book: " + e.getMessage());
         }
     }
     
@@ -504,25 +455,21 @@ public class StudentDashboardController {
         var logs = accessLogDAO.getAccessLogsByStudent(currentStudent.getStudentId());
         
         if (logs.isEmpty()) {
-            content.getChildren().add(new Label("No history yet. Start exploring books!"));
+            content.getChildren().add(new Label("No history yet. Start reading books!"));
         } else {
             TableView<com.elibrary.models.AccessLog> table = new TableView<>();
             table.setPrefHeight(400);
             
             TableColumn<com.elibrary.models.AccessLog, String> bookCol = new TableColumn<>("Book Title");
             bookCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getBookTitle()));
-            bookCol.setPrefWidth(250);
+            bookCol.setPrefWidth(350);
             
-            TableColumn<com.elibrary.models.AccessLog, String> typeCol = new TableColumn<>("Action");
-            typeCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getAccessType()));
-            typeCol.setPrefWidth(100);
-            
-            TableColumn<com.elibrary.models.AccessLog, String> dateCol = new TableColumn<>("Date");
+            TableColumn<com.elibrary.models.AccessLog, String> dateCol = new TableColumn<>("Date Viewed");
             dateCol.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
                 data.getValue().getAccessDate().toString()));
             dateCol.setPrefWidth(200);
             
-            table.getColumns().addAll(bookCol, typeCol, dateCol);
+            table.getColumns().addAll(bookCol, dateCol);
             table.getItems().addAll(logs);
             
             content.getChildren().add(table);

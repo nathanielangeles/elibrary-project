@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.elibrary.controllers.PDFViewerController"
+            prefHeight="800" prefWidth="1200"
+            style="-fx-background-color: #ecf0f1;">
+    
+    <!-- Top Toolbar -->
+    <top>
+        <VBox>
+            <!-- Title Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 15px 20px;">
+                <Label fx:id="titleLabel" text="Book Title" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label fx:id="authorLabel" text="by Author" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="closeButton" text="Close" onAction="#handleClose"
+                       style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8px 20px; -fx-background-radius: 4px;"/>
+            </HBox>
+            
+            <!-- Navigation Bar -->
+            <HBox alignment="CENTER" spacing="10" style="-fx-background-color: white; -fx-padding: 10px; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
+                <!-- Navigation Buttons -->
+                <Button text="⏮ First" onAction="#handleFirstPage"
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                <Button fx:id="prevButton" text="◀ Previous" onAction="#handlePrevPage"
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                
+                <!-- Page Info -->
+                <Label fx:id="pageLabel" text="Page 1 of 1" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 20px;"/>
+                
+                <Button fx:id="nextButton" text="Next ▶" onAction="#handleNextPage"
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                <Button text="Last ⏭" onAction="#handleLastPage"
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Zoom Controls -->
+                <Button text="🔍−" onAction="#handleZoomOut"
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                
+                <Slider fx:id="zoomSlider" prefWidth="150" min="0.5" max="3.0" value="1.5" 
+                       showTickMarks="false" showTickLabels="false"/>
+                
+                <Button text="🔍+" onAction="#handleZoomIn"
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 6px 12px; -fx-background-radius: 4px;"/>
+                
+                <Label text="Zoom" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Center - PDF Display -->
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" fitToHeight="true" 
+                   style="-fx-background-color: #95a5a6; -fx-background: #95a5a6;">
+            <StackPane style="-fx-background-color: #95a5a6; -fx-padding: 20px;">
+                <ImageView fx:id="pdfImageView" preserveRatio="true" smooth="true"/>
+            </StackPane>
+        </ScrollPane>
+    </center>
+    
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #34495e; -fx-padding: 10px 20px;">
+            <Label text="📖 E-Library PDF Viewer" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Use ◀ ▶ buttons or scroll to navigate • Zoom with slider" style="-fx-text-fill: #ecf0f1; -fx-font-size: 11px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

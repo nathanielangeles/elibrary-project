@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * Handles MySQL database connections using singleton pattern
  */
 public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/elibrary_db?useSSL=false&serverTimezone=UTC";
+    private static final String URL ="jdbc:mysql://localhost:3306/elibrary_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String USERNAME = "elibrary_user"; // Change as needed
     private static final String PASSWORD = "elibrary_pass"; // Change as needed
     
